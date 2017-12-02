@@ -37,6 +37,33 @@ func checksum(grid [][]int) int {
 	return checksum
 }
 
+func maxDivideable(numbers []int) int {
+	for i := 0; i < len(numbers); i++ {
+		for j := i + 1; j < len(numbers); j++ {
+			number1 := numbers[i]
+			number2 := numbers[j]
+
+			if number2 != 0 && number1%number2 == 0 {
+				return number1 / number2
+			} else if number1 != 0 && number2%number1 == 0 {
+				return number2 / number1
+			}
+		}
+	}
+
+	return 0
+}
+
+func checksum2(grid [][]int) int {
+	checksum := 0
+
+	for _, row := range grid {
+		checksum += maxDivideable(row)
+	}
+
+	return checksum
+}
+
 func parseGrid(r io.Reader) [][]int {
 	var grid [][]int
 
@@ -48,7 +75,9 @@ func parseGrid(r io.Reader) [][]int {
 			row = append(row, value)
 		}
 
-		grid = append(grid, row)
+		if len(row) > 0 {
+			grid = append(grid, row)
+		}
 	}
 
 	return grid
@@ -57,5 +86,5 @@ func parseGrid(r io.Reader) [][]int {
 func main() {
 	input, _ := ioutil.ReadAll(os.Stdin)
 	grid := parseGrid(bytes.NewReader(input))
-	fmt.Print(checksum(grid))
+	fmt.Print(checksum2(grid))
 }
