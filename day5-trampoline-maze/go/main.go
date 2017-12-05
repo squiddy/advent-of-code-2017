@@ -16,7 +16,11 @@ func walkMaze(instructions []int) int {
 
 	for iptr < len(instructions) {
 		jump := instructions[iptr]
-		instructions[iptr]++
+		if jump >= 3 {
+			instructions[iptr]--
+		} else {
+			instructions[iptr]++
+		}
 		iptr += jump
 		step++
 	}
