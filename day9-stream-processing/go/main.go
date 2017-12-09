@@ -5,6 +5,38 @@ import (
 	"io/ioutil"
 )
 
+func garbageCount(input string) int {
+	garbageCount := 0
+	inGarbage := false
+	idx := 0
+
+	for idx < len(input) {
+		char := string(input[idx])
+		if char == "!" {
+			idx += 2
+			continue
+		}
+
+		switch char {
+		case "<":
+			if inGarbage {
+				garbageCount++
+			}
+			inGarbage = true
+			break
+		case ">":
+			inGarbage = false
+			break
+		default:
+			if inGarbage {
+				garbageCount++
+			}
+		}
+		idx++
+	}
+	return garbageCount
+}
+
 func score(input string) int {
 	score := 0
 	inGarbage := false
@@ -46,4 +78,5 @@ func main() {
 	bytes, _ := ioutil.ReadFile("../input.txt")
 	input := string(bytes)
 	fmt.Println(score(input))
+	fmt.Println(garbageCount(input))
 }
