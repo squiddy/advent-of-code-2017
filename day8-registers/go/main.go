@@ -77,8 +77,9 @@ func RunCompare(instr Instruction, registers map[string]int) bool {
 	panic("Unrecognized comparision")
 }
 
-func RunProgram(program []Instruction) map[string]int {
+func RunProgram(program []Instruction) int {
 	registers := make(map[string]int)
+	highestValue := 0
 
 	for _, instr := range program {
 		if !RunCompare(instr, registers) {
@@ -98,20 +99,17 @@ func RunProgram(program []Instruction) map[string]int {
 		default:
 			panic("Unrecognized instruction")
 		}
+
+		if registers[instr.register] > highestValue {
+			highestValue = registers[instr.register]
+		}
 	}
 
-	return registers
+	return highestValue
 }
 
 func main() {
 	program := CreateProgram("../input2.txt")
-	registers := RunProgram(program)
-
-	highest := 0
-	for _, value := range registers {
-		if value > highest {
-			highest = value
-		}
-	}
+	highest := RunProgram(program)
 	fmt.Println(highest)
 }
