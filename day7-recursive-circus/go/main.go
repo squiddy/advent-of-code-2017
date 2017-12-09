@@ -7,35 +7,72 @@ import (
 	"strings"
 )
 
-func main() {
-	programs := make(map[string][]string)
+type Program struct {
+	name   string
+	weight int
+	childs []string
+}
 
-	f, _ := os.Open("../input.txt")
+func parse(filename string) map[string]Program {
+	programs := make(map[string]Program)
+
+	f, _ := os.Open(filename)
 	scanner := bufio.NewScanner(bufio.NewReader(f))
 	for scanner.Scan() {
 		line := scanner.Text()
 		line = strings.Replace(line, ",", "", -1)
 		fields := strings.Fields(line)
-		if len(fields) < 3 {
-			// ignore programs without childs
-			continue
-		}
 		name := fields[0]
-		childs := fields[3:]
-		programs[name] = childs
-	}
 
-	// delete all programs that are childs of another program
-	toDelete := []string{}
-	for _, childs := range programs {
-		for _, child := range childs {
-			toDelete = append(toDelete, child)
+		var childs []string
+		if len(fields) < 3 {
+			childs = []string{}
+		} else {
+			childs = fields[3:]
+		}
+
+		programs[name] = Program{
+			name:   name,
+			weight: 0,
+			childs: childs,
 		}
 	}
 
-	for _, name := range toDelete {
-		delete(programs, name)
+	return programs
+}
+
+func Index(haystack []string, needle string) int {
+	for idx, element := range haystack {
+		if element == needle {
+			return idx
+		}
 	}
 
-	fmt.Println(programs)
+	return -1
+}
+
+func Remove(list []string, element string) []string {
+	idx := Index(list, element)
+	return append(list[:idx], list[idx+1:]...)
+}
+
+func findRoot(programs map[string]Program) string {
+	// delete all programs that are childs of another program
+	var programNames []string
+	for name := range programs {
+		programNames = append(programNames, name)
+	}
+
+	for _, p := range programs {
+		for _, child := range p.childs {
+			programNames = Remove(programNames, child)
+		}
+	}
+
+	return programNames[0]
+}
+
+func main() {
+	programs := parse("../input2.txt")
+	fmt.Println(findRoot(programs))
 }
